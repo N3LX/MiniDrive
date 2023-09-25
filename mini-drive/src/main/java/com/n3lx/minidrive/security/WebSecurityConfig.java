@@ -1,4 +1,4 @@
-package com.n3lx.minidrive;
+package com.n3lx.minidrive.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,7 +14,7 @@ public class WebSecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(requests -> requests
-                        .requestMatchers("/*").permitAll());
+                        .requestMatchers("/**").permitAll());
         return http.build();
     }
 
