@@ -44,11 +44,12 @@ public class UserService implements GenericService<UserDTO> {
 
     @Override
     public UserDTO update(UserDTO userDTO) {
-        var user = userMapper.mapToEntity(userDTO);
-
-        var savedObject = userRepository.save(user);
-
-        return userMapper.mapToDTO(savedObject);
+        if (userRepository.findById(userDTO.getId()).isPresent()) {
+            var user = userMapper.mapToEntity(userDTO);
+            var savedObject = userRepository.save(user);
+            return userMapper.mapToDTO(savedObject);
+        }
+        return null;
     }
 
     @Override
