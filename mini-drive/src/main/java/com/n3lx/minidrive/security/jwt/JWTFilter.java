@@ -5,7 +5,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,7 +17,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 
-@Log
+@Slf4j
 public class JWTFilter extends OncePerRequestFilter {
 
     @Autowired
@@ -45,7 +45,7 @@ public class JWTFilter extends OncePerRequestFilter {
                 }
             }
         } catch (Exception e) {
-            logger.debug("Authentication attempt has failed with a non-null JWT provided", e);
+            log.debug("Authentication attempt has failed with a non-null JWT provided", e);
         }
 
         filterChain.doFilter(request, response);
