@@ -24,7 +24,7 @@ public class User implements UserDetails {
     @Column(nullable = false, length = 64)
     private String username;
 
-    @Column(nullable = false, length = 255)
+    @Column(nullable = false)
     private String password;
 
     private Set<String> roles;

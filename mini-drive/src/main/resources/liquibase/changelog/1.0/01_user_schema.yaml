@@ -1,0 +1,25 @@
+databaseChangeLog:
+
+  - changeSet:
+      id: 01
+      author: n3lx
+      changes:
+        - createTable:
+            schemaName: public
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: username
+                  type: varchar (64)
+              - column:
+                  name: password
+                  type: varchar (255)
+              - column:
+                  name: roles
+                  type: varchar (255) []
