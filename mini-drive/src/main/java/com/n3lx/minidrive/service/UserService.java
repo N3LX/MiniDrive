@@ -3,6 +3,7 @@ package com.n3lx.minidrive.service;
 import com.n3lx.minidrive.dto.UserDTO;
 import com.n3lx.minidrive.mapper.UserMapper;
 import com.n3lx.minidrive.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -12,6 +13,7 @@ import java.util.List;
 import java.util.Set;
 
 @Service
+@Slf4j
 public class UserService implements GenericService<UserDTO> {
 
     @Autowired
@@ -65,14 +67,22 @@ public class UserService implements GenericService<UserDTO> {
                 .toList();
     }
 
+    /**
+     * For now this method allows only for a password change
+     */
     @Override
     public UserDTO update(UserDTO userDTO) {
-        //TODO Validate password and username changes
         var existingUser = userRepository.findByUsername(userDTO.getUsername());
-        if (validatePassword(userDTO.getPassword()) && existingUser.isPresent()) {
+        if (existingUser.isPresent()) {
             var user = userMapper.mapToEntity(userDTO);
             user.setId(existingUser.get().getId());
             user.setRoles(existingUser.get().getRoles());
+
+            var newPassword = passwordEncoder.encode(user.getPassword());
+            if (!newPassword.equals(existingUser.get().getPassword()) && validatePassword(user.getPassword())) {
+                user.setPassword(newPassword);
+                log.debug("Password for user " + user.getUsername() + " has been changed");
+            }
 
             var savedObject = userRepository.save(user);
             return userMapper.mapToDTO(savedObject);
