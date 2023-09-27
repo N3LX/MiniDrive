@@ -4,9 +4,12 @@ import com.n3lx.minidrive.dto.UserDTO;
 import com.n3lx.minidrive.mapper.UserMapper;
 import com.n3lx.minidrive.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class UserService implements GenericService<UserDTO> {
@@ -15,19 +18,38 @@ public class UserService implements GenericService<UserDTO> {
     private UserRepository userRepository;
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    PasswordEncoder passwordEncoder;
+
+    @Value("${app.security.password.minLength}")
+    private int passwordMinLength;
+    @Value("${app.security.password.maxLength}")
+    private int passwordMaxLength;
 
     @Override
     public UserDTO create(UserDTO userDTO) {
-        var user = userMapper.mapToEntity(userDTO);
-
-        var savedObject = userRepository.save(user);
-
-        return userMapper.mapToDTO(savedObject);
+        if (validatePassword(userDTO.getPassword())
+                && userRepository.findByUsername(userDTO.getUsername()).isEmpty()) {
+            userDTO.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+            var user = userMapper.mapToEntity(userDTO);
+            user.setRoles(getDefaultRoles());
+            var savedObject = userRepository.save(user);
+            return userMapper.mapToDTO(savedObject);
+        } else {
+            throw new IllegalArgumentException("User with same username already exists");
+        }
     }
 
     @Override
     public UserDTO getById(Long id) {
         var user = userRepository.findById(id);
+        return user
+                .map(value -> userMapper.mapToDTO(value))
+                .orElse(null);
+    }
+
+    public UserDTO getByUsername(String username) {
+        var user = userRepository.findByUsername(username);
         return user
                 .map(value -> userMapper.mapToDTO(value))
                 .orElse(null);
@@ -44,17 +66,36 @@ public class UserService implements GenericService<UserDTO> {
 
     @Override
     public UserDTO update(UserDTO userDTO) {
-        if (userRepository.findById(userDTO.getId()).isPresent()) {
+        //TODO Validate password and username changes
+        var existingUser = userRepository.findByUsername(userDTO.getUsername());
+        if (validatePassword(userDTO.getPassword()) && existingUser.isPresent()) {
             var user = userMapper.mapToEntity(userDTO);
+            user.setRoles(existingUser.get().getRoles());
             var savedObject = userRepository.save(user);
             return userMapper.mapToDTO(savedObject);
+        } else {
+            throw new IllegalArgumentException("User " + userDTO.getUsername() + " does not exist");
         }
-        return null;
     }
 
     @Override
     public void delete(Long id) {
         userRepository.deleteById(id);
+    }
+
+    private boolean validatePassword(String password) {
+        if (password.length() >= passwordMinLength && password.length() <= passwordMaxLength) {
+            return true;
+        }
+        throw new IllegalArgumentException("Password must be between "
+                + passwordMinLength
+                + " and "
+                + passwordMaxLength +
+                " characters in length");
+    }
+
+    private Set<String> getDefaultRoles() {
+        return Set.of("ROLE_USER");
     }
 
 }

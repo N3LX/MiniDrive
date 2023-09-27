@@ -1,20 +1,24 @@
 package com.n3lx.minidrive.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.validation.constraints.NotNull;
+import lombok.*;
+import org.hibernate.validator.constraints.Length;
 
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Getter
 @Setter
 public class UserDTO {
 
     private Long id;
 
+    @NotNull
+    @Length(max = 64)
     private String username;
 
+    @NotNull
+    @Length(max = 255)
     private String password;
 
 }
