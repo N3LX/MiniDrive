@@ -33,6 +33,7 @@ public class UserService implements GenericService<UserDTO> {
             userDTO.setPassword(passwordEncoder.encode(userDTO.getPassword()));
             var user = userMapper.mapToEntity(userDTO);
             user.setRoles(getDefaultRoles());
+
             var savedObject = userRepository.save(user);
             return userMapper.mapToDTO(savedObject);
         } else {
@@ -70,7 +71,9 @@ public class UserService implements GenericService<UserDTO> {
         var existingUser = userRepository.findByUsername(userDTO.getUsername());
         if (validatePassword(userDTO.getPassword()) && existingUser.isPresent()) {
             var user = userMapper.mapToEntity(userDTO);
+            user.setId(existingUser.get().getId());
             user.setRoles(existingUser.get().getRoles());
+
             var savedObject = userRepository.save(user);
             return userMapper.mapToDTO(savedObject);
         } else {

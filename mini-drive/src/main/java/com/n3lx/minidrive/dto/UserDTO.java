@@ -11,8 +11,6 @@ import org.hibernate.validator.constraints.Length;
 @Setter
 public class UserDTO {
 
-    private Long id;
-
     @NotNull
     @Length(max = 64)
     private String username;
