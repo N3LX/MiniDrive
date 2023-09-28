@@ -6,7 +6,9 @@ import com.n3lx.minidrive.security.jwt.AuthRequest;
 import com.n3lx.minidrive.security.jwt.AuthResponse;
 import com.n3lx.minidrive.security.jwt.JWTUtil;
 import com.n3lx.minidrive.service.UserService;
+import com.n3lx.minidrive.web.support.RestErrorMessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -15,6 +17,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.sql.Timestamp;
+import java.time.Instant;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -50,12 +55,15 @@ public class AuthenticationController {
         return ResponseEntity.ok(response);
     }
 
-    @RequestMapping("/whoami")
+    @RequestMapping(value = "/whoami")
     public ResponseEntity<?> whoami(@AuthenticationPrincipal User user) {
         if (user != null) {
             return ResponseEntity.ok(user.getUsername());
         }
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(RestErrorMessage.builder()
+                .timestamp(Timestamp.from(Instant.now()))
+                .message("Unauthenticated user")
+                .build());
     }
 
 }
