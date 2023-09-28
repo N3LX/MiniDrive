@@ -36,7 +36,7 @@ public class UserServiceTest {
     private UserMapper userMapper;
 
     @BeforeEach
-    public void prepareTestedClass() {
+    public void setup() {
         Mockito.reset(userRepository);
     }
 
