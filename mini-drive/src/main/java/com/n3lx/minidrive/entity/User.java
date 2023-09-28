@@ -15,6 +15,7 @@ import java.util.Set;
 @Builder
 @Getter
 @Setter
+@EqualsAndHashCode
 public class User implements UserDetails {
 
     @Id

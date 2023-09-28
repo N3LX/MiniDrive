@@ -9,6 +9,7 @@ import org.hibernate.validator.constraints.Length;
 @Builder
 @Getter
 @Setter
+@EqualsAndHashCode
 public class UserDTO {
 
     @NotNull

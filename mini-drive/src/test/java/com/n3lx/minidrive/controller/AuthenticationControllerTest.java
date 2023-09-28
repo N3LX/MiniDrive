@@ -122,7 +122,7 @@ public class AuthenticationControllerTest {
                 .when()
                 .post("/api/auth/register")
                 .then()
-                .statusCode(200);
+                .statusCode(204);
     }
 
     @Test

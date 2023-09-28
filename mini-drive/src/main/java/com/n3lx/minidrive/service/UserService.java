@@ -21,7 +21,7 @@ public class UserService implements GenericService<UserDTO> {
     @Autowired
     private UserMapper userMapper;
     @Autowired
-    PasswordEncoder passwordEncoder;
+    private PasswordEncoder passwordEncoder;
 
     @Value("${app.security.password.minLength}")
     private int passwordMinLength;
@@ -68,27 +68,31 @@ public class UserService implements GenericService<UserDTO> {
     }
 
     /**
-     * For now this method allows only for a password change
+     * Allows to update a password associated with given user
+     *
+     * @param userDTO Object representing username password
+     * @return An object that should contain encoded password
      */
     @Override
     public UserDTO update(UserDTO userDTO) {
         var existingUser = userRepository.findByUsername(userDTO.getUsername());
-        if (existingUser.isPresent()) {
-            var user = userMapper.mapToEntity(userDTO);
-            user.setId(existingUser.get().getId());
-            user.setRoles(existingUser.get().getRoles());
 
-            var newPassword = passwordEncoder.encode(user.getPassword());
-            if (!newPassword.equals(existingUser.get().getPassword()) && validatePassword(user.getPassword())) {
-                user.setPassword(newPassword);
-                log.debug("Password for user " + user.getUsername() + " has been changed");
-            }
-
-            var savedObject = userRepository.save(user);
-            return userMapper.mapToDTO(savedObject);
-        } else {
+        if (existingUser.isEmpty()) {
             throw new IllegalArgumentException("User " + userDTO.getUsername() + " does not exist");
         }
+
+        var user = userMapper.mapToEntity(userDTO);
+        user.setId(existingUser.get().getId());
+        user.setRoles(existingUser.get().getRoles());
+
+        var isPasswordChanged = !passwordEncoder.matches(userDTO.getPassword(), existingUser.get().getPassword());
+        if (isPasswordChanged && validatePassword(userDTO.getPassword())) {
+            user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+            var savedObject = userRepository.save(user);
+            log.debug("Password for user " + userDTO.getUsername() + " has been changed");
+            return userMapper.mapToDTO(savedObject);
+        }
+        return userDTO;
     }
 
     @Override

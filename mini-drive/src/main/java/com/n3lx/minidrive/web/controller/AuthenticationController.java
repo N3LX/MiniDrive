@@ -41,7 +41,7 @@ public class AuthenticationController {
                 .password(request.getPassword())
                 .build();
         userService.create(newUser);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/login")
