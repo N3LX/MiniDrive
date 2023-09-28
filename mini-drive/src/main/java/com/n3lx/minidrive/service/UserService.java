@@ -3,6 +3,7 @@ package com.n3lx.minidrive.service;
 import com.n3lx.minidrive.dto.UserDTO;
 import com.n3lx.minidrive.mapper.UserMapper;
 import com.n3lx.minidrive.repository.UserRepository;
+import com.n3lx.minidrive.service.contract.GenericCrudService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,7 +15,7 @@ import java.util.Set;
 
 @Service
 @Slf4j
-public class UserService implements GenericService<UserDTO> {
+public class UserService implements GenericCrudService<UserDTO> {
 
     @Autowired
     private UserRepository userRepository;

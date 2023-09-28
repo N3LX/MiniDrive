@@ -1,8 +1,8 @@
-package com.n3lx.minidrive.service;
+package com.n3lx.minidrive.service.contract;
 
 import java.util.List;
 
-public interface GenericService<DTO> {
+public interface GenericCrudService<DTO> {
 
     DTO create(DTO dto);
 
