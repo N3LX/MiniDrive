@@ -38,5 +38,10 @@ public class FileStorageController {
         return ResponseEntity.ok(resource);
     }
 
+    @DeleteMapping(value = "/delete")
+    public ResponseEntity<?> delete(@RequestPart String fileName, @AuthenticationPrincipal User user) {
+        var deleteResult = fileStorageService.delete(fileName, user.getId());
+        return ResponseEntity.ok(deleteResult);
+    }
 
 }

@@ -77,7 +77,7 @@ public class FileStorageServiceImpl implements FileStorageService {
                 throw new FileNotFoundException("File with given name was not found in storage");
             }
         } catch (MalformedURLException | FileNotFoundException e) {
-            log.error("Could not load file from path: " + filePath);
+            log.warn("Could not load file from path: " + filePath);
             throw new RuntimeException(e);
         }
     }
@@ -99,7 +99,14 @@ public class FileStorageServiceImpl implements FileStorageService {
 
     @Override
     public boolean delete(String filename, Long ownerId) {
-        return false;
+        var filePath = generateFilePath(filename, ownerId);
+        try {
+            Files.delete(filePath);
+        } catch (IOException e) {
+            log.warn("Could not delete file from path: " + filePath);
+            throw new RuntimeException(e);
+        }
+        return true;
     }
 
     private Path generatePathToUserDirectory(Long ownerId) {
