@@ -1,6 +1,7 @@
 package com.n3lx.minidrive.service;
 
 import com.n3lx.minidrive.service.contract.FileStorageService;
+import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -22,6 +23,52 @@ public class FileStorageServiceImpl implements FileStorageService {
 
     @Value("${app.fileStorage.rootAbsolutePath}")
     private String rootAbsolutePath;
+
+    @PostConstruct
+    private void init() {
+        var messageBuilder = new StringBuilder();
+        messageBuilder.append("Initializing service").append("\n");
+
+        //Ensure that the root folder exists in filesystem and if not - try to create it
+        messageBuilder.append("Checking if root directory exists in location ");
+        var rootPath = Paths
+                .get(rootAbsolutePath)
+                .normalize()
+                .toAbsolutePath();
+        messageBuilder.append("\"").append(rootPath).append("\": ");
+
+        if (Files.exists(rootPath)) {
+            if (Files.isDirectory(rootPath)) {
+                messageBuilder.append("Directory exists");
+                log.info(messageBuilder.toString());
+                return;
+            } else {
+                messageBuilder
+                        .append("Resource at this location is not a directory").append("\n")
+                        .append("Resolve this issue manually and try starting the application again").append("\n")
+                        .append("You can change root directory in application.yaml " +
+                                "via app.fileStorage.rootAbsolutePath property");
+                log.error(messageBuilder.toString());
+                System.exit(1);
+            }
+        } else {
+            messageBuilder
+                    .append("Directory does not exist").append("\n")
+                    .append("Attempting to create a directory ").append(": ");
+            try {
+                Files.createDirectory(rootPath);
+                messageBuilder.append("Success");
+            } catch (IOException e) {
+                messageBuilder.append("Failure, see the stack trace for more info")
+                        .append("Resolve this issue manually and try starting the application again").append("\n")
+                        .append("You can change root directory in application.yaml " +
+                                "via app.fileStorage.rootAbsolutePath property");
+                log.error(messageBuilder.toString(), e);
+                System.exit(1);
+            }
+        }
+        log.info(messageBuilder.toString());
+    }
 
     @Override
     public boolean store(MultipartFile file, Long ownerId) {
