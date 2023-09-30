@@ -21,8 +21,8 @@ import java.util.stream.Collectors;
 @Slf4j
 public class FileStorageServiceImpl implements FileStorageService {
 
-    @Value("${app.fileStorage.rootAbsolutePath}")
-    private String rootAbsolutePath;
+    @Value("${app.fileStorage.rootDirAbsolutePath}")
+    private String rootDirAbsolutePath;
 
     @PostConstruct
     private void init() {
@@ -32,7 +32,7 @@ public class FileStorageServiceImpl implements FileStorageService {
         //Ensure that the root folder exists in filesystem and if not - try to create it
         messageBuilder.append("Checking if root directory exists in location ");
         var rootPath = Paths
-                .get(rootAbsolutePath)
+                .get(rootDirAbsolutePath)
                 .normalize()
                 .toAbsolutePath();
         messageBuilder.append("\"").append(rootPath).append("\": ");
@@ -171,7 +171,7 @@ public class FileStorageServiceImpl implements FileStorageService {
 
     private Path generatePathToUserDirectory(Long ownerId) {
         return Paths
-                .get(rootAbsolutePath)
+                .get(rootDirAbsolutePath)
                 .normalize()
                 .resolve(ownerId.toString())
                 .toAbsolutePath();

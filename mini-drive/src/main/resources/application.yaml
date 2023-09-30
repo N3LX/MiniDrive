@@ -7,7 +7,7 @@ app:
       minLength: 8
       maxLength: 32
   fileStorage:
-    rootAbsolutePath: "C:\\MiniDriveStorage"
+    rootDirAbsolutePath: "C:\\MiniDriveStorage"
 
 spring:
   datasource:
