@@ -3,6 +3,7 @@ package com.n3lx.minidrive.controller;
 import com.n3lx.minidrive.dto.UserDTO;
 import io.restassured.parsing.Parser;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,6 +23,7 @@ public class AuthenticationControllerTest {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    @BeforeEach
     @AfterEach
     void clearTables() {
         JdbcTestUtils.deleteFromTables(jdbcTemplate, "users");
