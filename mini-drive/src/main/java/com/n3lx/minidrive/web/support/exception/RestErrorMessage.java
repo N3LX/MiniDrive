@@ -1,4 +1,4 @@
-package com.n3lx.minidrive.web.support;
+package com.n3lx.minidrive.web.support.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

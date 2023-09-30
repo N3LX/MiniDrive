@@ -1,4 +1,4 @@
-package com.n3lx.minidrive.web.support;
+package com.n3lx.minidrive.web.support.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

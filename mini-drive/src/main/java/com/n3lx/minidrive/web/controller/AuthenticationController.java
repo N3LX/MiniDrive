@@ -6,7 +6,7 @@ import com.n3lx.minidrive.security.jwt.AuthRequest;
 import com.n3lx.minidrive.security.jwt.AuthResponse;
 import com.n3lx.minidrive.security.jwt.JWTUtil;
 import com.n3lx.minidrive.service.UserService;
-import com.n3lx.minidrive.web.support.RestErrorMessage;
+import com.n3lx.minidrive.web.support.exception.RestErrorMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
