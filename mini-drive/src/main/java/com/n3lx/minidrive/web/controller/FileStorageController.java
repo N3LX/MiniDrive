@@ -8,6 +8,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.net.URI;
+
 @RestController
 @RequestMapping("/api/storage")
 public class FileStorageController {
@@ -19,7 +21,7 @@ public class FileStorageController {
     public ResponseEntity<?> upload(@RequestBody MultipartFile file, @AuthenticationPrincipal User user) {
         var uploadResult = fileStorageService.store(file, user.getId());
         if (uploadResult) {
-            return ResponseEntity.ok().build();
+            return ResponseEntity.created(URI.create("/api/storage/load")).build();
         } else {
             return ResponseEntity.badRequest().build();
         }
@@ -39,16 +41,16 @@ public class FileStorageController {
 
     @DeleteMapping(value = "/delete")
     public ResponseEntity<?> delete(@RequestPart String fileName, @AuthenticationPrincipal User user) {
-        var deleteResult = fileStorageService.delete(fileName, user.getId());
-        return ResponseEntity.ok(deleteResult);
+        fileStorageService.delete(fileName, user.getId());
+        return ResponseEntity.noContent().build();
     }
 
     @PatchMapping(value = "/rename")
     public ResponseEntity<?> rename(@RequestPart String currentFileName,
                                     @RequestPart String newFileName,
                                     @AuthenticationPrincipal User user) {
-        var renameResult = fileStorageService.rename(currentFileName, newFileName, user.getId());
-        return ResponseEntity.ok().build();
+        fileStorageService.rename(currentFileName, newFileName, user.getId());
+        return ResponseEntity.created(URI.create("/api/storage/load")).build();
     }
 
 }
