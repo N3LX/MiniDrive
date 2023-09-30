@@ -10,16 +10,20 @@ public class UserMapper implements GenericMapper<User, UserDTO> {
     @Override
     public User mapToEntity(UserDTO userDTO) {
         return User.builder()
+                .id(userDTO.getId())
                 .username(userDTO.getUsername())
                 .password(userDTO.getPassword())
+                .roles(userDTO.getRoles())
                 .build();
     }
 
     @Override
     public UserDTO mapToDTO(User user) {
         return UserDTO.builder()
+                .id(user.getId())
                 .username(user.getUsername())
                 .password(user.getPassword())
+                .roles(user.getRoles())
                 .build();
     }
 
