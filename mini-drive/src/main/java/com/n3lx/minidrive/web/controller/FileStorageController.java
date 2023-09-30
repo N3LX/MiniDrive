@@ -43,4 +43,12 @@ public class FileStorageController {
         return ResponseEntity.ok(deleteResult);
     }
 
+    @PatchMapping(value = "/rename")
+    public ResponseEntity<?> rename(@RequestPart String currentFileName,
+                                    @RequestPart String newFileName,
+                                    @AuthenticationPrincipal User user) {
+        var renameResult = fileStorageService.rename(currentFileName, newFileName, user.getId());
+        return ResponseEntity.ok().build();
+    }
+
 }

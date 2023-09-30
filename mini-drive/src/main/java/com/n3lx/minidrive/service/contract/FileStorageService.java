@@ -15,4 +15,6 @@ public interface FileStorageService {
 
     boolean delete(String filename, Long ownerId);
 
+    boolean rename(String currentFilename, String newFileName, Long ownerId);
+
 }

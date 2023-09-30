@@ -109,6 +109,19 @@ public class FileStorageServiceImpl implements FileStorageService {
         return true;
     }
 
+    @Override
+    public boolean rename(String currentFilename, String newFileName, Long ownerId) {
+        var currentFilePath = generateFilePath(currentFilename, ownerId);
+        var newFilePath = generateFilePath(newFileName, ownerId);
+        try {
+            Files.move(currentFilePath, newFilePath);
+        } catch (IOException e) {
+            log.warn("Could not rename file from path " + currentFilePath + " to " + newFilePath);
+            throw new RuntimeException(e);
+        }
+        return true;
+    }
+
     private Path generatePathToUserDirectory(Long ownerId) {
         return Paths
                 .get(rootAbsolutePath)
