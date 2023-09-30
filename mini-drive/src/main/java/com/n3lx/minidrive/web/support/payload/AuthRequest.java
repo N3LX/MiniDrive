@@ -1,14 +1,14 @@
-package com.n3lx.minidrive.security.jwt;
+package com.n3lx.minidrive.web.support.payload;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-public class AuthResponse {
+public class AuthRequest {
 
     private final String username;
 
-    private final String token;
+    private final String password;
 
 }

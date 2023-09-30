@@ -2,8 +2,8 @@ package com.n3lx.minidrive.web.controller;
 
 import com.n3lx.minidrive.dto.UserDTO;
 import com.n3lx.minidrive.entity.User;
-import com.n3lx.minidrive.security.jwt.AuthRequest;
-import com.n3lx.minidrive.security.jwt.AuthResponse;
+import com.n3lx.minidrive.web.support.payload.AuthRequest;
+import com.n3lx.minidrive.web.support.payload.AuthResponse;
 import com.n3lx.minidrive.security.jwt.JWTUtil;
 import com.n3lx.minidrive.service.UserService;
 import com.n3lx.minidrive.web.support.exception.RestErrorMessage;
