@@ -6,6 +6,8 @@ app:
     password:
       minLength: 8
       maxLength: 32
+  fileStorage:
+    rootAbsolutePath: "C:\\MiniDriveStorage"
 
 spring:
   datasource:
@@ -19,6 +21,10 @@ spring:
       ddl-auto: none
   liquibase:
     change-log: classpath:liquibase/changelog/main-changelog.yaml
+  servlet:
+    multipart:
+      max-file-size: 1GB
+      max-request-size: 1GB
 
 logging:
   level:
