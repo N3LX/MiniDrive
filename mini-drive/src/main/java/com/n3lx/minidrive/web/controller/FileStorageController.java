@@ -3,7 +3,6 @@ package com.n3lx.minidrive.web.controller;
 import com.n3lx.minidrive.entity.User;
 import com.n3lx.minidrive.service.contract.FileStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -33,7 +32,7 @@ public class FileStorageController {
     }
 
     @RequestMapping(value = "/load")
-    public ResponseEntity<Resource> load(@RequestPart String fileName, @AuthenticationPrincipal User user) {
+    public ResponseEntity<?> load(@RequestPart String fileName, @AuthenticationPrincipal User user) {
         var resource = fileStorageService.load(fileName, user.getId());
         return ResponseEntity.ok(resource);
     }
