@@ -3,11 +3,15 @@ package com.n3lx.minidrive.service;
 import com.n3lx.minidrive.service.contract.FileStorageService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.nio.file.*;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -63,8 +67,19 @@ public class FileStorageServiceImpl implements FileStorageService {
     }
 
     @Override
-    public MultipartFile load(String filename, Long ownerId) {
-        return null;
+    public Resource load(String filename, Long ownerId) {
+        var filePath = generateFilePath(filename, ownerId);
+        try {
+            var resource = new UrlResource(filePath.toUri());
+            if (resource.exists()) {
+                return resource;
+            } else {
+                throw new FileNotFoundException("File with given name was not found in storage");
+            }
+        } catch (MalformedURLException | FileNotFoundException e) {
+            log.error("Could not load file from path: " + filePath);
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
