@@ -17,7 +17,7 @@ public class FileStorageController {
     @Autowired
     FileStorageService fileStorageService;
 
-    @PostMapping("/upload")
+    @RequestMapping(value = "/upload", method = RequestMethod.POST)
     public ResponseEntity<?> upload(@RequestBody MultipartFile file, @AuthenticationPrincipal User user) {
         if (file == null) {
             return ResponseEntity.badRequest().build();
@@ -31,25 +31,25 @@ public class FileStorageController {
         }
     }
 
-    @RequestMapping("/listfiles")
+    @RequestMapping(value = "/listfiles", method = RequestMethod.GET)
     public ResponseEntity<?> listFiles(@AuthenticationPrincipal User user) {
         var fileList = fileStorageService.listAllFiles(user.getId());
         return ResponseEntity.ok(fileList);
     }
 
-    @RequestMapping(value = "/load")
+    @RequestMapping(value = "/load", method = RequestMethod.GET)
     public ResponseEntity<?> load(@RequestPart String fileName, @AuthenticationPrincipal User user) {
         var resource = fileStorageService.load(fileName, user.getId());
         return ResponseEntity.ok(resource);
     }
 
-    @DeleteMapping(value = "/delete")
+    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
     public ResponseEntity<?> delete(@RequestPart String fileName, @AuthenticationPrincipal User user) {
         fileStorageService.delete(fileName, user.getId());
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping(value = "/rename")
+    @RequestMapping(value = "/rename", method = RequestMethod.PATCH)
     public ResponseEntity<?> rename(@RequestPart String currentFileName,
                                     @RequestPart String newFileName,
                                     @AuthenticationPrincipal User user) {

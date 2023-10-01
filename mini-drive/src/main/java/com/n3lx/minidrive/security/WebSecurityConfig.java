@@ -26,7 +26,7 @@ public class WebSecurityConfig {
         http.authorizeHttpRequests(requests -> requests
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/storage/**").hasRole("USER")
-                        .anyRequest().authenticated())
+                        .anyRequest().permitAll())
                 .csrf(AbstractHttpConfigurer::disable);
 
         http.addFilterBefore(jwtFilter(), UsernamePasswordAuthenticationFilter.class);

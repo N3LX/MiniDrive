@@ -35,6 +35,7 @@ dependencies {
     implementation("io.jsonwebtoken:jjwt-api:$jjwtVersion")
     runtimeOnly("io.jsonwebtoken:jjwt-impl:$jjwtVersion")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:$jjwtVersion")
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")
     compileOnly("org.projectlombok:lombok:$lombokVersion")
     annotationProcessor("org.projectlombok:lombok:$lombokVersion")
     testImplementation("org.springframework.boot:spring-boot-starter-test")

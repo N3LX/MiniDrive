@@ -30,3 +30,9 @@ logging:
   level:
     root: INFO
     com.n3lx.minidrive: DEBUG
+
+springdoc:
+  api-docs:
+    enable: true
+  swagger-ui:
+    enable: true

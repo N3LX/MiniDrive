@@ -13,10 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -34,7 +31,7 @@ public class AuthenticationController {
     @Autowired
     JWTUtil jwtUtil;
 
-    @PostMapping("/register")
+    @RequestMapping(value = "/register", method = RequestMethod.POST)
     public ResponseEntity<?> register(@RequestBody AuthRequest request) throws Exception {
         var newUser = UserDTO.builder()
                 .username(request.getUsername())
@@ -44,7 +41,7 @@ public class AuthenticationController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/login")
+    @RequestMapping(value = "/login", method = RequestMethod.POST)
     public ResponseEntity<?> login(@RequestBody AuthRequest request) {
         var authentication = authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
@@ -55,7 +52,7 @@ public class AuthenticationController {
         return ResponseEntity.ok(response);
     }
 
-    @RequestMapping(value = "/whoami")
+    @RequestMapping(value = "/whoami", method = RequestMethod.GET)
     public ResponseEntity<?> whoami(@AuthenticationPrincipal User user) {
         if (user != null) {
             return ResponseEntity.ok(user.getUsername());
