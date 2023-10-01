@@ -1,6 +1,6 @@
 # MiniDrive
 
-MiniDrive is a simple REST API works similarly to cloud services like Google Drive or Dropbox.
+MiniDrive is a simple REST API that works similarly to cloud services like Google Drive or Dropbox.
 
 Application uses:
 - Spring Boot
