@@ -55,7 +55,7 @@ public class AuthenticationControllerTest {
     }
 
     @Test
-    public void login_noUsernameInDB_badRequestStatus() {
+    public void login_noUsernameInDB_isForbidden() {
         given()
                 .port(port)
                 .contentType("application/json")
@@ -66,7 +66,7 @@ public class AuthenticationControllerTest {
                 .when()
                 .post("/api/auth/login")
                 .then()
-                .statusCode(400)
+                .statusCode(403)
                 .defaultParser(Parser.JSON)
                 .body("message", equalTo("Bad credentials"))
                 .body("timestamp", notNullValue());
@@ -86,7 +86,7 @@ public class AuthenticationControllerTest {
                 .when()
                 .post("/api/auth/login")
                 .then()
-                .statusCode(400)
+                .statusCode(403)
                 .defaultParser(Parser.JSON)
                 .body("message", equalTo("Bad credentials"))
                 .body("timestamp", notNullValue());
@@ -139,14 +139,14 @@ public class AuthenticationControllerTest {
                 .when()
                 .post("/api/auth/register")
                 .then()
-                .statusCode(400)
+                .statusCode(403)
                 .defaultParser(Parser.JSON)
                 .body("message", equalTo("Password must be between 8 and 32 characters in length"))
                 .body("timestamp", notNullValue());
     }
 
     @Test
-    public void register_alreadyRegisteredUsername_badRequest() {
+    public void register_alreadyRegisteredUsername_isForbidden() {
         registerTestUser();
 
         given()
@@ -159,7 +159,7 @@ public class AuthenticationControllerTest {
                 .when()
                 .post("/api/auth/register")
                 .then()
-                .statusCode(400)
+                .statusCode(403)
                 .defaultParser(Parser.JSON)
                 .body("message", equalTo("User with same username already exists"))
                 .body("timestamp", notNullValue());

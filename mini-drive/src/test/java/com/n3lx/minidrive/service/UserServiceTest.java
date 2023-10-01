@@ -12,6 +12,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
@@ -131,7 +132,7 @@ public class UserServiceTest {
         var userDTO = userMapper.mapToDTO(getTestUser());
         userDTO.setPassword("123");
 
-        var exception = assertThrows(IllegalArgumentException.class, () -> userService.create(userDTO));
+        var exception = assertThrows(BadCredentialsException.class, () -> userService.create(userDTO));
 
         assertEquals("Password must be between 8 and 32 characters in length", exception.getMessage());
     }
@@ -144,7 +145,7 @@ public class UserServiceTest {
 
         Mockito.when(userRepository.findByUsername(user.getUsername()))
                 .thenReturn(Optional.of(user));
-        var exception = assertThrows(IllegalArgumentException.class, () -> userService.create(userDTO));
+        var exception = assertThrows(BadCredentialsException.class, () -> userService.create(userDTO));
 
         assertEquals("User with same username already exists", exception.getMessage());
     }
@@ -169,7 +170,7 @@ public class UserServiceTest {
 
         Mockito.when(userRepository.findByUsername(user.getUsername()))
                 .thenReturn(Optional.of(user));
-        var exception = assertThrows(IllegalArgumentException.class, () -> userService.update(userDTO));
+        var exception = assertThrows(BadCredentialsException.class, () -> userService.update(userDTO));
 
         assertEquals("Password must be between 8 and 32 characters in length", exception.getMessage());
     }

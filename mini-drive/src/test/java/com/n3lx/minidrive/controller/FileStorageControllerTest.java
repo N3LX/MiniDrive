@@ -115,11 +115,7 @@ public class FileStorageControllerTest {
                 .when()
                 .post("/api/storage/upload")
                 .then()
-                .statusCode(400)
-                .body("message", equalTo("Cannot invoke \"" +
-                        "org.springframework.web.multipart.MultipartFile.getOriginalFilename()\" " +
-                        "because \"file\" is null"))
-                .body("timestamp", notNullValue());
+                .statusCode(400);
     }
 
     @Test
@@ -134,8 +130,8 @@ public class FileStorageControllerTest {
                 .post("/api/storage/upload")
                 .then()
                 .statusCode(400)
-                .body("message", equalTo("java.nio.file.FileAlreadyExistsException: " +
-                        "File with same name already exists"))
+                .body("message", equalTo("File \"" + getTestFilePath().getFileName().toString()
+                        + "\" already exists"))
                 .body("timestamp", notNullValue());
     }
 
@@ -190,10 +186,8 @@ public class FileStorageControllerTest {
                 .delete("/api/storage/delete")
                 .then()
                 .statusCode(400)
-                .body("message", equalTo("java.nio.file.NoSuchFileException:" +
-                        " C:\\MiniDriveStorageTest\\" +
-                        userService.getByUsername("testUser").getId() +
-                        "\\Bee Movie Transcript.txt"))
+                .body("message", equalTo("File \"" + getTestFilePath().getFileName().toString()
+                        + "\" does not exist"))
                 .body("timestamp", notNullValue());
     }
 
@@ -229,10 +223,8 @@ public class FileStorageControllerTest {
                 .patch("/api/storage/rename")
                 .then()
                 .statusCode(400)
-                .body("message", equalTo("java.nio.file.NoSuchFileException:" +
-                        " C:\\MiniDriveStorageTest\\" +
-                        userService.getByUsername("testUser").getId() +
-                        "\\Bee Movie Transcript.txt"))
+                .body("message", equalTo("File \"" + getTestFilePath().getFileName().toString()
+                        + "\" does not exist"))
                 .body("timestamp", notNullValue());
 
         assertFalse(getTestUserDirectoryPath().resolve(newFileName).toFile().exists());

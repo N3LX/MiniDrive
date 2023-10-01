@@ -19,6 +19,10 @@ public class FileStorageController {
 
     @PostMapping("/upload")
     public ResponseEntity<?> upload(@RequestBody MultipartFile file, @AuthenticationPrincipal User user) {
+        if (file == null) {
+            return ResponseEntity.badRequest().build();
+        }
+
         var uploadResult = fileStorageService.store(file, user.getId());
         if (uploadResult) {
             return ResponseEntity.created(URI.create("/api/storage/load")).build();

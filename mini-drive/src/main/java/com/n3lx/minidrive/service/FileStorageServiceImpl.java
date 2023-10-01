@@ -90,7 +90,7 @@ public class FileStorageServiceImpl implements FileStorageService {
                     Files.createDirectory(userDirectoryPath);
                 }
                 if (Files.exists(filePath)) {
-                    throw new FileAlreadyExistsException("File with same name already exists");
+                    throw new FileAlreadyExistsException(filePath.toString());
                 }
 
                 Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);

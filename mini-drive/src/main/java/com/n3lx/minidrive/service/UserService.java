@@ -7,6 +7,7 @@ import com.n3lx.minidrive.service.contract.GenericCrudService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -40,7 +41,7 @@ public class UserService implements GenericCrudService<UserDTO> {
             var savedObject = userRepository.save(user);
             return userMapper.mapToDTO(savedObject);
         } else {
-            throw new IllegalArgumentException("User with same username already exists");
+            throw new BadCredentialsException("User with same username already exists");
         }
     }
 
@@ -105,7 +106,7 @@ public class UserService implements GenericCrudService<UserDTO> {
         if (password.length() >= passwordMinLength && password.length() <= passwordMaxLength) {
             return true;
         }
-        throw new IllegalArgumentException("Password must be between "
+        throw new BadCredentialsException("Password must be between "
                 + passwordMinLength
                 + " and "
                 + passwordMaxLength +
