@@ -24,8 +24,6 @@ public class UserService implements GenericCrudService<UserDTO> {
     private UserMapper userMapper;
     @Autowired
     private PasswordEncoder passwordEncoder;
-    @Autowired
-    PropertiesUtil propertiesUtil;
 
     @Override
     public UserDTO create(UserDTO userDTO) {
@@ -100,14 +98,14 @@ public class UserService implements GenericCrudService<UserDTO> {
     }
 
     private boolean validatePassword(String password) {
-        if (password.length() >= propertiesUtil.getPasswordMinLength()
-                && password.length() <= propertiesUtil.getPasswordMaxLength()) {
+        if (password.length() >= PropertiesUtil.passwordMinLength
+                && password.length() <= PropertiesUtil.passwordMaxLength) {
             return true;
         }
         throw new BadCredentialsException("Password must be between "
-                + propertiesUtil.getPasswordMinLength()
+                + PropertiesUtil.passwordMinLength
                 + " and "
-                + propertiesUtil.getPasswordMaxLength() +
+                + PropertiesUtil.passwordMaxLength +
                 " characters in length");
     }
 

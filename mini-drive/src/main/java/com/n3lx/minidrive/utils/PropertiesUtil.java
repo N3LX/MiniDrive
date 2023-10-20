@@ -5,16 +5,16 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
- * Utility for accessing non-standard/custom values from application.properties
+ * Utility for accessing non-standard/custom properties and static values used in configuration of non-bean objects
  */
 @Component
-@Getter
 public class PropertiesUtil {
 
-    @Value("${app.security.password.minLength}")
-    private int passwordMinLength;
-    @Value("${app.security.password.maxLength}")
-    private int passwordMaxLength;
+    public static final int passwordMinLength = 8;
+
+    public static final int passwordMaxLength = 32;
+
+    @Getter
     @Value("${app.fileStorage.rootDirAbsolutePath}")
     private String rootDirAbsolutePath;
 

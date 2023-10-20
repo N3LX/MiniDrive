@@ -2,10 +2,6 @@ app:
   jwt:
     secret: )H=#T@#[]HdPDMNqNMCMVS_usIr~_0Si87Zys562Sw~TAj$JKlx!]eYK.57ld#'W
     validityTimeInSeconds: 600
-  security:
-    password:
-      minLength: 8
-      maxLength: 32
   fileStorage:
     rootDirAbsolutePath: "C:\\MiniDriveStorage"
 
