@@ -3,6 +3,8 @@ package com.n3lx.minidrive.service;
 import com.n3lx.minidrive.entity.User;
 import com.n3lx.minidrive.mapper.UserMapper;
 import com.n3lx.minidrive.repository.UserRepository;
+import jakarta.validation.ConstraintViolationException;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -132,9 +134,9 @@ public class UserServiceTest {
         var userDTO = userMapper.mapToDTO(getTestUser());
         userDTO.setPassword("123");
 
-        var exception = assertThrows(BadCredentialsException.class, () -> userService.create(userDTO));
+        var exception = assertThrows(ConstraintViolationException.class, () -> userService.create(userDTO));
 
-        assertEquals("Password must be between 8 and 32 characters in length", exception.getMessage());
+        assertEquals("password: size must be between 8 and 32", exception.getMessage());
     }
 
     @Test
@@ -148,6 +150,36 @@ public class UserServiceTest {
         var exception = assertThrows(BadCredentialsException.class, () -> userService.create(userDTO));
 
         assertEquals("User with same username already exists", exception.getMessage());
+    }
+
+    @Test
+    public void create_withUsernameCharCountExceedingDBLimit_throwsException() {
+        var user = getTestUser();
+        var longUsername = StringUtils.repeat("x", 128);
+        user.setUsername(longUsername);
+        var userDTO = userMapper.mapToDTO(user);
+        userDTO.setPassword("12345678");
+
+        var exception = assertThrows(ConstraintViolationException.class, () -> userService.create(userDTO));
+
+        assertEquals("username: size must be between 0 and 64", exception.getMessage());
+    }
+
+    @Test
+    public void create_withIncorrectUsernameAndPassword_throwsException() {
+        var firstExpectedMessage = "username: size must be between 0 and 64";
+        var secondExpectedMessage = "password: size must be between 8 and 32";
+
+        var user = getTestUser();
+        var longUsername = StringUtils.repeat("x", 128);
+        user.setUsername(longUsername);
+        var userDTO = userMapper.mapToDTO(user);
+        userDTO.setPassword("1");
+
+        var exception = assertThrows(ConstraintViolationException.class, () -> userService.create(userDTO));
+
+        assertTrue(exception.getMessage().contains(firstExpectedMessage));
+        assertTrue(exception.getMessage().contains(secondExpectedMessage));
     }
 
     @Test
@@ -170,9 +202,9 @@ public class UserServiceTest {
 
         Mockito.when(userRepository.findByUsername(user.getUsername()))
                 .thenReturn(Optional.of(user));
-        var exception = assertThrows(BadCredentialsException.class, () -> userService.update(userDTO));
+        var exception = assertThrows(ConstraintViolationException.class, () -> userService.update(userDTO));
 
-        assertEquals("Password must be between 8 and 32 characters in length", exception.getMessage());
+        assertEquals("password: size must be between 8 and 32", exception.getMessage());
     }
 
     @Test
