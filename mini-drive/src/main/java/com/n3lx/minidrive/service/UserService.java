@@ -4,9 +4,9 @@ import com.n3lx.minidrive.dto.UserDTO;
 import com.n3lx.minidrive.mapper.UserMapper;
 import com.n3lx.minidrive.repository.UserRepository;
 import com.n3lx.minidrive.service.contract.GenericCrudService;
+import com.n3lx.minidrive.utils.PropertiesUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -24,11 +24,8 @@ public class UserService implements GenericCrudService<UserDTO> {
     private UserMapper userMapper;
     @Autowired
     private PasswordEncoder passwordEncoder;
-
-    @Value("${app.security.password.minLength}")
-    private int passwordMinLength;
-    @Value("${app.security.password.maxLength}")
-    private int passwordMaxLength;
+    @Autowired
+    PropertiesUtil propertiesUtil;
 
     @Override
     public UserDTO create(UserDTO userDTO) {
@@ -103,13 +100,14 @@ public class UserService implements GenericCrudService<UserDTO> {
     }
 
     private boolean validatePassword(String password) {
-        if (password.length() >= passwordMinLength && password.length() <= passwordMaxLength) {
+        if (password.length() >= propertiesUtil.getPasswordMinLength()
+                && password.length() <= propertiesUtil.getPasswordMaxLength()) {
             return true;
         }
         throw new BadCredentialsException("Password must be between "
-                + passwordMinLength
+                + propertiesUtil.getPasswordMinLength()
                 + " and "
-                + passwordMaxLength +
+                + propertiesUtil.getPasswordMaxLength() +
                 " characters in length");
     }
 

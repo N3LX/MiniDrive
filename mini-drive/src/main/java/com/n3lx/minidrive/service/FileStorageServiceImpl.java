@@ -1,9 +1,10 @@
 package com.n3lx.minidrive.service;
 
 import com.n3lx.minidrive.service.contract.FileStorageService;
+import com.n3lx.minidrive.utils.PropertiesUtil;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
@@ -21,8 +22,8 @@ import java.util.stream.Collectors;
 @Slf4j
 public class FileStorageServiceImpl implements FileStorageService {
 
-    @Value("${app.fileStorage.rootDirAbsolutePath}")
-    private String rootDirAbsolutePath;
+    @Autowired
+    PropertiesUtil propertiesUtil;
 
     @PostConstruct
     private void init() {
@@ -32,7 +33,7 @@ public class FileStorageServiceImpl implements FileStorageService {
         //Ensure that the root folder exists in filesystem and if not - try to create it
         messageBuilder.append("Checking if root directory exists in location ");
         var rootPath = Paths
-                .get(rootDirAbsolutePath)
+                .get(propertiesUtil.getRootDirAbsolutePath())
                 .normalize()
                 .toAbsolutePath();
         messageBuilder.append("\"").append(rootPath).append("\": ");
@@ -171,7 +172,7 @@ public class FileStorageServiceImpl implements FileStorageService {
 
     private Path generatePathToUserDirectory(Long ownerId) {
         return Paths
-                .get(rootDirAbsolutePath)
+                .get(propertiesUtil.getRootDirAbsolutePath())
                 .normalize()
                 .resolve(ownerId.toString())
                 .toAbsolutePath();
