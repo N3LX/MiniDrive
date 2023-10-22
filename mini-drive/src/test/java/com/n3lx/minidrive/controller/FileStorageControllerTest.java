@@ -4,6 +4,7 @@ import com.n3lx.minidrive.entity.User;
 import com.n3lx.minidrive.mapper.UserMapper;
 import com.n3lx.minidrive.security.jwt.JWTUtil;
 import com.n3lx.minidrive.service.UserService;
+import com.n3lx.minidrive.utils.PropertiesUtil;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,9 +30,6 @@ public class FileStorageControllerTest {
     @LocalServerPort
     private int port;
 
-    @Value("${app.fileStorage.rootDirAbsolutePath}")
-    private String rootDirAbsolutePath;
-
     @Autowired
     UserService userService;
 
@@ -41,10 +39,13 @@ public class FileStorageControllerTest {
     @Autowired
     JWTUtil jwtUtil;
 
+    @Autowired
+    PropertiesUtil propertiesUtil;
+
     @BeforeEach
     @AfterEach
     void clearRootDirectory() throws IOException {
-        var rootDirPath = Paths.get(rootDirAbsolutePath);
+        var rootDirPath = Paths.get(propertiesUtil.getRootDirAbsolutePath());
         try (var filePaths = Files.walk(rootDirPath)) {
             filePaths
                     .filter(path -> !path.equals(rootDirPath))
@@ -75,7 +76,7 @@ public class FileStorageControllerTest {
 
     Path getTestUserDirectoryPath() {
         var userDTO = userService.getByUsername("testUser");
-        return Paths.get(rootDirAbsolutePath, String.valueOf(userDTO.getId())).normalize();
+        return Paths.get(propertiesUtil.getRootDirAbsolutePath(), String.valueOf(userDTO.getId())).normalize();
     }
 
     Path getTestFilePath() {

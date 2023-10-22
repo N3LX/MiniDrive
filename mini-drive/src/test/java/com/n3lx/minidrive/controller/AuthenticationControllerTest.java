@@ -141,7 +141,7 @@ public class AuthenticationControllerTest {
                 .then()
                 .statusCode(403)
                 .defaultParser(Parser.JSON)
-                .body("message", equalTo("Password must be between 8 and 32 characters in length"))
+                .body("message", equalTo("password size must be between 8 and 32"))
                 .body("timestamp", notNullValue());
     }
 
