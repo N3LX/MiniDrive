@@ -1,6 +1,7 @@
 package com.n3lx.minidrive.dto;
 
 import com.n3lx.minidrive.utils.PropertiesUtil;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -18,7 +19,8 @@ public class UserDTO {
     private Long id;
 
     @NotNull
-    @Size(max = 64)
+    @NotBlank
+    @Size(min = PropertiesUtil.usernameMinLength, max = PropertiesUtil.usernameMaxLength)
     private String username;
 
     @NotNull
