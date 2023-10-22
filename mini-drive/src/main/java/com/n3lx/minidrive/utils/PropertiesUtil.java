@@ -14,6 +14,13 @@ public class PropertiesUtil {
 
     public static final int passwordMaxLength = 32;
 
+    public static final int usernameMinLength = 3;
+
+    /**
+     * Maximum supported value is 64, exceeding it will cause the application to work incorrectly
+     */
+    public static final int usernameMaxLength = 16;
+
     @Getter
     @Value("${app.fileStorage.rootDirAbsolutePath}")
     private String rootDirAbsolutePath;

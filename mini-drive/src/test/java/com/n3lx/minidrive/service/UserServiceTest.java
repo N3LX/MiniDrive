@@ -162,12 +162,12 @@ public class UserServiceTest {
 
         var exception = assertThrows(ConstraintViolationException.class, () -> userService.create(userDTO));
 
-        assertEquals("username: size must be between 0 and 64", exception.getMessage());
+        assertEquals("username: size must be between 3 and 16", exception.getMessage());
     }
 
     @Test
     public void create_withIncorrectUsernameAndPassword_throwsException() {
-        var firstExpectedMessage = "username: size must be between 0 and 64";
+        var firstExpectedMessage = "username: size must be between 3 and 16";
         var secondExpectedMessage = "password: size must be between 8 and 32";
 
         var user = getTestUser();
