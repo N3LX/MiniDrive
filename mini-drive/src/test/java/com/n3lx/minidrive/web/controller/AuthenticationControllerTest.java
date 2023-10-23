@@ -1,4 +1,4 @@
-package com.n3lx.minidrive.controller;
+package com.n3lx.minidrive.web.controller;
 
 import com.n3lx.minidrive.dto.UserDTO;
 import io.restassured.parsing.Parser;

@@ -1,4 +1,4 @@
-package com.n3lx.minidrive.controller;
+package com.n3lx.minidrive.web.controller;
 
 import com.n3lx.minidrive.entity.User;
 import com.n3lx.minidrive.mapper.UserMapper;
