@@ -1,0 +1,3 @@
+app:
+  fileStorage:
+    rootDirAbsolutePath: "C:\\MiniDriveStorageTest"
