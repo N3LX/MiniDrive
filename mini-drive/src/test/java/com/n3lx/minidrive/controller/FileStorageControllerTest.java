@@ -5,11 +5,8 @@ import com.n3lx.minidrive.mapper.UserMapper;
 import com.n3lx.minidrive.security.jwt.JWTUtil;
 import com.n3lx.minidrive.service.UserService;
 import com.n3lx.minidrive.utils.PropertiesUtil;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.util.FileSystemUtils;
@@ -25,6 +22,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class FileStorageControllerTest {
 
     @LocalServerPort
@@ -65,6 +63,11 @@ public class FileStorageControllerTest {
     void deleteTestUser() {
         var userId = userService.getByUsername(getTestUser().getUsername()).getId();
         userService.delete(userId);
+    }
+
+    @AfterAll
+    void delete() {
+        FileSystemUtils.deleteRecursively(new File(propertiesUtil.getRootDirAbsolutePath()));
     }
 
     User getTestUser() {
