@@ -30,6 +30,7 @@ Alternatively, you can provide your own Postgres database instead of the that wa
 2. Open application.yml in src/main/resources and ensure that rootDirAbsolutePath is set correctly depending on your filesystem and desired location
 3. Run the java project via :bootRun gradle task
 
+By default a DEV config is used, to run a PROD config simply pass `SPRING_PROFILES_ACTIVE=prod` environment variable when launching the application.
 
 ## API endpoints
 
