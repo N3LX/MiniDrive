@@ -1,5 +1,6 @@
 package com.n3lx.minidrive.service;
 
+import com.n3lx.minidrive.service.contract.ArchivingService;
 import com.n3lx.minidrive.service.contract.FileStorageService;
 import com.n3lx.minidrive.utils.PropertiesUtil;
 import jakarta.annotation.PostConstruct;
@@ -15,6 +16,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.nio.file.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,6 +26,9 @@ public class FileStorageServiceImpl implements FileStorageService {
 
     @Autowired
     PropertiesUtil propertiesUtil;
+
+    @Autowired
+    ArchivingService archivingService;
 
     @PostConstruct
     private void init() {
@@ -128,6 +133,15 @@ public class FileStorageServiceImpl implements FileStorageService {
             log.warn("Could not load file from path: " + filePath);
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public Resource loadMultiple(List<String> fileNames, Long ownerId) {
+        var resourceList = new ArrayList<Resource>();
+        for (var fileName : fileNames) {
+            resourceList.add(load(fileName, ownerId));
+        }
+        return archivingService.archive(resourceList, ownerId);
     }
 
     @Override

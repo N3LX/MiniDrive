@@ -25,4 +25,8 @@ public class PropertiesUtil {
     @Value("${app.fileStorage.rootDirAbsolutePath}")
     private String rootDirAbsolutePath;
 
+    @Getter
+    @Value("${app.fileStorage.tempDirName}")
+    private String tempDirName;
+
 }
