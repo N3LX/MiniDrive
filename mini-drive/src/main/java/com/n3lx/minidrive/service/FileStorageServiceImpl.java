@@ -1,19 +1,23 @@
 package com.n3lx.minidrive.service;
 
+import com.n3lx.minidrive.service.contract.ArchivingService;
 import com.n3lx.minidrive.service.contract.FileStorageService;
+import com.n3lx.minidrive.utils.PropertiesUtil;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.awt.print.Pageable;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.nio.file.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,8 +25,11 @@ import java.util.stream.Collectors;
 @Slf4j
 public class FileStorageServiceImpl implements FileStorageService {
 
-    @Value("${app.fileStorage.rootDirAbsolutePath}")
-    private String rootDirAbsolutePath;
+    @Autowired
+    PropertiesUtil propertiesUtil;
+
+    @Autowired
+    ArchivingService archivingService;
 
     @PostConstruct
     private void init() {
@@ -32,7 +39,7 @@ public class FileStorageServiceImpl implements FileStorageService {
         //Ensure that the root folder exists in filesystem and if not - try to create it
         messageBuilder.append("Checking if root directory exists in location ");
         var rootPath = Paths
-                .get(rootDirAbsolutePath)
+                .get(propertiesUtil.getRootDirAbsolutePath())
                 .normalize()
                 .toAbsolutePath();
         messageBuilder.append("\"").append(rootPath).append("\": ");
@@ -121,12 +128,21 @@ public class FileStorageServiceImpl implements FileStorageService {
             if (resource.exists()) {
                 return resource;
             } else {
-                throw new FileNotFoundException("File with given name was not found in storage");
+                throw new FileNotFoundException("File " + filename + " was not found in storage");
             }
         } catch (MalformedURLException | FileNotFoundException e) {
             log.warn("Could not load file from path: " + filePath);
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public Resource loadMultiple(List<String> fileNames, Long ownerId) {
+        var resourceList = new ArrayList<Resource>();
+        for (var fileName : fileNames) {
+            resourceList.add(load(fileName, ownerId));
+        }
+        return archivingService.archive(resourceList, ownerId);
     }
 
     @Override
@@ -141,6 +157,18 @@ public class FileStorageServiceImpl implements FileStorageService {
             return List.of();
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public List<String> listFiles(Long ownerId, Integer pageNumber, Integer pageSize) {
+        try {
+            var completeFileList = listAllFiles(ownerId);
+            int startIndex = (pageNumber - 1) * pageSize;
+            int endIndex = Math.min(startIndex + pageSize, completeFileList.size());
+            return completeFileList.subList(startIndex, endIndex);
+        } catch (IndexOutOfBoundsException | IllegalArgumentException ignored) {
+            return List.of();
         }
     }
 
@@ -171,7 +199,7 @@ public class FileStorageServiceImpl implements FileStorageService {
 
     private Path generatePathToUserDirectory(Long ownerId) {
         return Paths
-                .get(rootDirAbsolutePath)
+                .get(propertiesUtil.getRootDirAbsolutePath())
                 .normalize()
                 .resolve(ownerId.toString())
                 .toAbsolutePath();

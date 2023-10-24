@@ -1,14 +1,12 @@
-package com.n3lx.minidrive.controller;
+package com.n3lx.minidrive.web.controller;
 
 import com.n3lx.minidrive.entity.User;
 import com.n3lx.minidrive.mapper.UserMapper;
 import com.n3lx.minidrive.security.jwt.JWTUtil;
 import com.n3lx.minidrive.service.UserService;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import com.n3lx.minidrive.utils.PropertiesUtil;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.util.FileSystemUtils;
@@ -24,13 +22,11 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class FileStorageControllerTest {
 
     @LocalServerPort
     private int port;
-
-    @Value("${app.fileStorage.rootDirAbsolutePath}")
-    private String rootDirAbsolutePath;
 
     @Autowired
     UserService userService;
@@ -41,10 +37,13 @@ public class FileStorageControllerTest {
     @Autowired
     JWTUtil jwtUtil;
 
+    @Autowired
+    PropertiesUtil propertiesUtil;
+
     @BeforeEach
     @AfterEach
     void clearRootDirectory() throws IOException {
-        var rootDirPath = Paths.get(rootDirAbsolutePath);
+        var rootDirPath = Paths.get(propertiesUtil.getRootDirAbsolutePath());
         try (var filePaths = Files.walk(rootDirPath)) {
             filePaths
                     .filter(path -> !path.equals(rootDirPath))
@@ -66,6 +65,11 @@ public class FileStorageControllerTest {
         userService.delete(userId);
     }
 
+    @AfterAll
+    void delete() {
+        FileSystemUtils.deleteRecursively(new File(propertiesUtil.getRootDirAbsolutePath()));
+    }
+
     User getTestUser() {
         return User.builder()
                 .username("testUser")
@@ -75,7 +79,11 @@ public class FileStorageControllerTest {
 
     Path getTestUserDirectoryPath() {
         var userDTO = userService.getByUsername("testUser");
-        return Paths.get(rootDirAbsolutePath, String.valueOf(userDTO.getId())).normalize();
+        return Paths.get(propertiesUtil.getRootDirAbsolutePath(), String.valueOf(userDTO.getId())).normalize();
+    }
+
+    Path getTestTempDirectoryPath() {
+        return Paths.get(propertiesUtil.getRootDirAbsolutePath(), propertiesUtil.getTempDirName()).normalize();
     }
 
     Path getTestFilePath() {
@@ -161,6 +169,57 @@ public class FileStorageControllerTest {
     }
 
     @Test
+    public void listFilesWithPagination_fileInStore_returnsListOfOneFile() {
+        copyTestFileToTestUserDirectory();
+        given()
+                .port(port)
+                .auth().oauth2(jwtUtil.generateToken(getTestUser()))
+                .when()
+                .get("/api/storage/listfiles/1/1")
+                .then()
+                .statusCode(200)
+                .body(equalTo("[\"" + getTestFilePath().getFileName() + "\"]"));
+    }
+
+    @Test
+    public void listFilesWithPagination_fileInStoreButPaginationOutOfBounds_returnsEmptyList() {
+        copyTestFileToTestUserDirectory();
+        given()
+                .port(port)
+                .auth().oauth2(jwtUtil.generateToken(getTestUser()))
+                .when()
+                .get("/api/storage/listfiles/4/1")
+                .then()
+                .statusCode(200)
+                .body(equalTo("[]"));
+    }
+
+    @Test
+    public void listFilesWithPagination_noFileInStore_returnsEmptyList() {
+        given()
+                .port(port)
+                .auth().oauth2(jwtUtil.generateToken(getTestUser()))
+                .when()
+                .get("/api/storage/listfiles/1/1")
+                .then()
+                .statusCode(200)
+                .body(equalTo("[]"));
+    }
+
+    @Test
+    public void listFilesWithPagination_fileInStoreAndPageSizeGreaterThanNumberOfFiles_returnsListOfOneFile() {
+        copyTestFileToTestUserDirectory();
+        given()
+                .port(port)
+                .auth().oauth2(jwtUtil.generateToken(getTestUser()))
+                .when()
+                .get("/api/storage/listfiles/1/100")
+                .then()
+                .statusCode(200)
+                .body(equalTo("[\"" + getTestFilePath().getFileName() + "\"]"));
+    }
+
+    @Test
     public void delete_fileInStore_deletesFireFromStorage() {
         copyTestFileToTestUserDirectory();
 
@@ -228,6 +287,94 @@ public class FileStorageControllerTest {
                 .body("timestamp", notNullValue());
 
         assertFalse(getTestUserDirectoryPath().resolve(newFileName).toFile().exists());
+    }
+
+    @Test
+    public void loadMultiple_emptyRequestBody_returnsBadRequest() {
+        given()
+                .port(port)
+                .auth().oauth2(jwtUtil.generateToken(getTestUser()))
+                .when()
+                .get("/api/storage/loadmultiple")
+                .then()
+                .statusCode(400)
+                .body("message", equalTo("Empty request body, " +
+                        "refer to OpenAPI for correct usage of this endpoint"))
+                .body("timestamp", notNullValue());
+
+        assertFalse(Files.exists(getTestTempDirectoryPath()));
+    }
+
+    @Test
+    public void loadMultiple_listOfSingleNonExistingFile_returnsBadRequest() {
+        given()
+                .port(port)
+                .auth().oauth2(jwtUtil.generateToken(getTestUser()))
+                .contentType("application/json")
+                .body("[\"1.txt\"]")
+                .when()
+                .get("/api/storage/loadmultiple")
+                .then()
+                .statusCode(400)
+                .body("message", equalTo("File 1.txt was not found in storage"))
+                .body("timestamp", notNullValue());
+
+        assertFalse(Files.exists(getTestTempDirectoryPath()));
+    }
+
+    @Test
+    public void loadMultiple_listOfMultipleNonExistingFiles_returnsBadRequest() {
+        given()
+                .port(port)
+                .auth().oauth2(jwtUtil.generateToken(getTestUser()))
+                .contentType("application/json")
+                .body("[\"1.txt\",\"2.txt\"]")
+                .when()
+                .get("/api/storage/loadmultiple")
+                .then()
+                .statusCode(400)
+                .body("message", equalTo("File 1.txt was not found in storage"))
+                .body("timestamp", notNullValue());
+
+        assertFalse(Files.exists(getTestTempDirectoryPath()));
+    }
+
+    @Test
+    public void loadMultiple_listWithMultipleEntriesButSingleNonExistingFile_returnsBadRequest() {
+        copyTestFileToTestUserDirectory();
+
+        given()
+                .port(port)
+                .auth().oauth2(jwtUtil.generateToken(getTestUser()))
+                .contentType("application/json")
+                .body("[\"Bee Movie Transcript.txt\",\"2.txt\"]")
+                .when()
+                .get("/api/storage/loadmultiple")
+                .then()
+                .statusCode(400)
+                .body("message", equalTo("File 2.txt was not found in storage"))
+                .body("timestamp", notNullValue());
+
+        assertFalse(Files.exists(getTestTempDirectoryPath()));
+    }
+
+    @Test
+    public void loadMultiple_listWithSingleValidFile_returnsStream() throws IOException {
+        copyTestFileToTestUserDirectory();
+
+        given()
+                .port(port)
+                .auth().oauth2(jwtUtil.generateToken(getTestUser()))
+                .contentType("application/json")
+                .body("[\"Bee Movie Transcript.txt\"]")
+                .when()
+                .get("/api/storage/loadmultiple")
+                .then()
+                .statusCode(200)
+                .body(notNullValue());
+
+        assertTrue(Files.exists(getTestTempDirectoryPath()));
+        assertEquals(2, Files.walk(getTestTempDirectoryPath()).count());
     }
 
 }

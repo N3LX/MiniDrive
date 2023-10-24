@@ -1,8 +1,10 @@
 package com.n3lx.minidrive.dto;
 
+import com.n3lx.minidrive.utils.PropertiesUtil;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.*;
-import org.hibernate.validator.constraints.Length;
 
 import java.util.Set;
 
@@ -17,11 +19,12 @@ public class UserDTO {
     private Long id;
 
     @NotNull
-    @Length(max = 64)
+    @NotBlank
+    @Size(min = PropertiesUtil.usernameMinLength, max = PropertiesUtil.usernameMaxLength)
     private String username;
 
     @NotNull
-    @Length(max = 255)
+    @Size(min = PropertiesUtil.passwordMinLength, max = PropertiesUtil.passwordMaxLength)
     private String password;
 
     private Set<String> roles;

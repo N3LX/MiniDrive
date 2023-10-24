@@ -4,9 +4,11 @@ import com.n3lx.minidrive.dto.UserDTO;
 import com.n3lx.minidrive.mapper.UserMapper;
 import com.n3lx.minidrive.repository.UserRepository;
 import com.n3lx.minidrive.service.contract.GenericCrudService;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.Validation;
+import jakarta.validation.ValidatorFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -25,15 +27,12 @@ public class UserService implements GenericCrudService<UserDTO> {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @Value("${app.security.password.minLength}")
-    private int passwordMinLength;
-    @Value("${app.security.password.maxLength}")
-    private int passwordMaxLength;
+    private final ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
 
     @Override
     public UserDTO create(UserDTO userDTO) {
-        if (validatePassword(userDTO.getPassword())
-                && userRepository.findByUsername(userDTO.getUsername()).isEmpty()) {
+        var isUsernameAvailable = userRepository.findByUsername(userDTO.getUsername()).isEmpty();
+        if (validateDTO(userDTO) && isUsernameAvailable) {
             userDTO.setPassword(passwordEncoder.encode(userDTO.getPassword()));
             var user = userMapper.mapToEntity(userDTO);
             user.setRoles(getDefaultRoles());
@@ -88,7 +87,7 @@ public class UserService implements GenericCrudService<UserDTO> {
         user.setRoles(existingUser.get().getRoles());
 
         var isPasswordChanged = !passwordEncoder.matches(userDTO.getPassword(), existingUser.get().getPassword());
-        if (isPasswordChanged && validatePassword(userDTO.getPassword())) {
+        if (isPasswordChanged && validateDTO(userDTO)) {
             user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
             var savedObject = userRepository.save(user);
             log.debug("Password for user " + userDTO.getUsername() + " has been changed");
@@ -102,15 +101,13 @@ public class UserService implements GenericCrudService<UserDTO> {
         userRepository.deleteById(id);
     }
 
-    private boolean validatePassword(String password) {
-        if (password.length() >= passwordMinLength && password.length() <= passwordMaxLength) {
+    private boolean validateDTO(UserDTO userDTO) {
+        var validator = validatorFactory.getValidator();
+        var violations = validator.validate(userDTO);
+        if (violations.isEmpty()) {
             return true;
         }
-        throw new BadCredentialsException("Password must be between "
-                + passwordMinLength
-                + " and "
-                + passwordMaxLength +
-                " characters in length");
+        throw new ConstraintViolationException(violations);
     }
 
     private Set<String> getDefaultRoles() {

@@ -1,18 +1,22 @@
 package com.n3lx.minidrive.web.support.exception;
 
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 
+import java.io.FileNotFoundException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.HashMap;
 
 @RestControllerAdvice
 @Order(0)
@@ -26,6 +30,16 @@ public class RestExceptionHandler {
                 .build();
 
         return new ResponseEntity<>(errorMessage, HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(FileNotFoundException.class)
+    public ResponseEntity<Object> handleFileNotFoundException(FileNotFoundException exception) {
+        var errorMessage = RestErrorMessage.builder()
+                .timestamp(Timestamp.from(Instant.now()))
+                .message(exception.getMessage())
+                .build();
+
+        return new ResponseEntity<>(errorMessage, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(FileAlreadyExistsException.class)
@@ -45,6 +59,37 @@ public class RestExceptionHandler {
         var errorMessage = RestErrorMessage.builder()
                 .timestamp(Timestamp.from(Instant.now()))
                 .message("File \"" + filename + "\" does not exist")
+                .build();
+
+        return new ResponseEntity<>(errorMessage, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<Object> handleConstraintViolationException(ConstraintViolationException exception) {
+        var violationMessages = new HashMap<>();
+
+        for (var violation : exception.getConstraintViolations()) {
+            violationMessages.put(String.valueOf(violation.getPropertyPath()), violation.getMessage());
+        }
+
+        var formattedMessage = violationMessages
+                .toString()
+                .substring(1, violationMessages.toString().length() - 1)
+                .replace("=", " ");
+
+        var errorMessage = RestErrorMessage.builder()
+                .timestamp(Timestamp.from(Instant.now()))
+                .message(formattedMessage)
+                .build();
+
+        return new ResponseEntity<>(errorMessage, HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<Object> HttpMessageNotReadableException(HttpMessageNotReadableException exception) {
+        var errorMessage = RestErrorMessage.builder()
+                .timestamp(Timestamp.from(Instant.now()))
+                .message("Empty request body, refer to OpenAPI for correct usage of this endpoint")
                 .build();
 
         return new ResponseEntity<>(errorMessage, HttpStatus.BAD_REQUEST);

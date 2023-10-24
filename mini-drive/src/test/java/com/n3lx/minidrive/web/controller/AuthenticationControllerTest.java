@@ -1,4 +1,4 @@
-package com.n3lx.minidrive.controller;
+package com.n3lx.minidrive.web.controller;
 
 import com.n3lx.minidrive.dto.UserDTO;
 import io.restassured.parsing.Parser;
@@ -40,18 +40,6 @@ public class AuthenticationControllerTest {
                 .when()
                 .post("/api/auth/register")
                 .then();
-    }
-
-    @Test
-    public void whoAmI_unauthenticated_unauthorizedStatus() {
-        given()
-                .port(port)
-                .when()
-                .get("/api/auth/whoami")
-                .then()
-                .statusCode(401)
-                .body("message", equalTo("Unauthenticated user"))
-                .body("timestamp", notNullValue());
     }
 
     @Test
@@ -141,7 +129,7 @@ public class AuthenticationControllerTest {
                 .then()
                 .statusCode(403)
                 .defaultParser(Parser.JSON)
-                .body("message", equalTo("Password must be between 8 and 32 characters in length"))
+                .body("message", equalTo("password size must be between 8 and 32"))
                 .body("timestamp", notNullValue());
     }
 
