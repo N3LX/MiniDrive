@@ -8,4 +8,6 @@ public interface ArchivingService {
 
     Resource archive(List<Resource> resourceList, Long ownerId);
 
+    void cleanupArchives();
+
 }

@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.io.FileInputStream;
@@ -15,6 +16,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -70,6 +72,29 @@ public class ZipArchivingService implements ArchivingService {
         } finally {
             log.debug(messageBuilder.toString());
         }
+    }
+
+    @Override
+    @Scheduled(fixedRate = PropertiesUtil.tempDirArchiveRetentionInSeconds * 1000)
+    public void cleanupArchives() {
+        log.info("Archive directory cleanup started");
+        var tempPath = generatePathToTempDirectory();
+        AtomicInteger removedFiles = new AtomicInteger();
+        try (var filePaths = Files.walk(tempPath)) {
+            filePaths
+                    .filter(path -> !path.equals(tempPath))
+                    .forEach(path -> {
+                        try {
+                            Files.delete(path);
+                            removedFiles.getAndIncrement();
+                        } catch (IOException e) {
+                            log.debug("Could not remove a file during cleanup", e);
+                        }
+                    });
+        } catch (IOException e) {
+            log.debug("An error has occurred while traversing temp directory", e);
+        }
+        log.info("Archive cleanup complete, removed file count: " + removedFiles.get());
     }
 
     private void createTempDirIfNotCreated() {

@@ -21,6 +21,8 @@ public class PropertiesUtil {
      */
     public static final int usernameMaxLength = 16;
 
+    public static final int tempDirArchiveRetentionInSeconds = 600;
+
     @Getter
     @Value("${app.fileStorage.rootDirAbsolutePath}")
     private String rootDirAbsolutePath;
