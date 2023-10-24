@@ -127,7 +127,7 @@ public class FileStorageServiceImpl implements FileStorageService {
             if (resource.exists()) {
                 return resource;
             } else {
-                throw new FileNotFoundException("File with given name was not found in storage");
+                throw new FileNotFoundException("File " + filename + " was not found in storage");
             }
         } catch (MalformedURLException | FileNotFoundException e) {
             log.warn("Could not load file from path: " + filePath);

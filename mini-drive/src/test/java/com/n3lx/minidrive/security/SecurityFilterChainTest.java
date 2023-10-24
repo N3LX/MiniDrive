@@ -56,6 +56,20 @@ public class SecurityFilterChainTest {
     }
 
     @Test
+    public void loadmultiple_unauthenticated_forbiddenStatus() {
+        given()
+                .port(port)
+                .when()
+                .get("/api/storage/loadmultiple")
+                .then()
+                .statusCode(403)
+                .body("error", equalTo("Forbidden"))
+                .body("path", equalTo("/api/storage/loadmultiple"))
+                .body("status", equalTo(403))
+                .body("timestamp", notNullValue());
+    }
+
+    @Test
     public void delete_unauthenticated_forbiddenStatus() {
         given()
                 .port(port)
