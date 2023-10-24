@@ -42,6 +42,20 @@ public class SecurityFilterChainTest {
     }
 
     @Test
+    public void listFilesWithPagination_unauthenticated_forbiddenStatus() {
+        given()
+                .port(port)
+                .when()
+                .get("/api/storage/listfiles/1/1")
+                .then()
+                .statusCode(403)
+                .body("error", equalTo("Forbidden"))
+                .body("path", equalTo("/api/storage/listfiles/1/1"))
+                .body("status", equalTo(403))
+                .body("timestamp", notNullValue());
+    }
+
+    @Test
     public void load_unauthenticated_forbiddenStatus() {
         given()
                 .port(port)

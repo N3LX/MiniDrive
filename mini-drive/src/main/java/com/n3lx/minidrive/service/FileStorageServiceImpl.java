@@ -11,6 +11,7 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.awt.print.Pageable;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -156,6 +157,18 @@ public class FileStorageServiceImpl implements FileStorageService {
             return List.of();
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public List<String> listFiles(Long ownerId, Integer pageNumber, Integer pageSize) {
+        try {
+            var completeFileList = listAllFiles(ownerId);
+            int startIndex = (pageNumber - 1) * pageSize;
+            int endIndex = Math.min(startIndex + pageSize, completeFileList.size());
+            return completeFileList.subList(startIndex, endIndex);
+        } catch (IndexOutOfBoundsException | IllegalArgumentException ignored) {
+            return List.of();
         }
     }
 

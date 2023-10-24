@@ -15,6 +15,8 @@ public interface FileStorageService {
 
     List<String> listAllFiles(Long ownerId);
 
+    List<String> listFiles(Long ownerId, Integer pageNumber, Integer pageSize);
+
     boolean delete(String filename, Long ownerId);
 
     boolean rename(String currentFilename, String newFileName, Long ownerId);

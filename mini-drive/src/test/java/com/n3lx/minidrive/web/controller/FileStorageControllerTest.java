@@ -169,6 +169,57 @@ public class FileStorageControllerTest {
     }
 
     @Test
+    public void listFilesWithPagination_fileInStore_returnsListOfOneFile() {
+        copyTestFileToTestUserDirectory();
+        given()
+                .port(port)
+                .auth().oauth2(jwtUtil.generateToken(getTestUser()))
+                .when()
+                .get("/api/storage/listfiles/1/1")
+                .then()
+                .statusCode(200)
+                .body(equalTo("[\"" + getTestFilePath().getFileName() + "\"]"));
+    }
+
+    @Test
+    public void listFilesWithPagination_fileInStoreButPaginationOutOfBounds_returnsEmptyList() {
+        copyTestFileToTestUserDirectory();
+        given()
+                .port(port)
+                .auth().oauth2(jwtUtil.generateToken(getTestUser()))
+                .when()
+                .get("/api/storage/listfiles/4/1")
+                .then()
+                .statusCode(200)
+                .body(equalTo("[]"));
+    }
+
+    @Test
+    public void listFilesWithPagination_noFileInStore_returnsEmptyList() {
+        given()
+                .port(port)
+                .auth().oauth2(jwtUtil.generateToken(getTestUser()))
+                .when()
+                .get("/api/storage/listfiles/1/1")
+                .then()
+                .statusCode(200)
+                .body(equalTo("[]"));
+    }
+
+    @Test
+    public void listFilesWithPagination_fileInStoreAndPageSizeGreaterThanNumberOfFiles_returnsListOfOneFile() {
+        copyTestFileToTestUserDirectory();
+        given()
+                .port(port)
+                .auth().oauth2(jwtUtil.generateToken(getTestUser()))
+                .when()
+                .get("/api/storage/listfiles/1/100")
+                .then()
+                .statusCode(200)
+                .body(equalTo("[\"" + getTestFilePath().getFileName() + "\"]"));
+    }
+
+    @Test
     public void delete_fileInStore_deletesFireFromStorage() {
         copyTestFileToTestUserDirectory();
 
