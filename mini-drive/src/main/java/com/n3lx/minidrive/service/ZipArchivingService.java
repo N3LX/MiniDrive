@@ -77,8 +77,12 @@ public class ZipArchivingService implements ArchivingService {
     @Override
     @Scheduled(fixedRate = PropertiesUtil.tempDirArchiveRetentionInSeconds * 1000)
     public void cleanupArchives() {
-        log.info("Archive directory cleanup started");
         var tempPath = generatePathToTempDirectory();
+        if(!Files.exists(tempPath)){
+            log.info("Archive directory cleanup did not start as temporary directory was not yet created");
+            return;
+        }
+        log.info("Archive directory cleanup started");
         AtomicInteger removedFiles = new AtomicInteger();
         try (var filePaths = Files.walk(tempPath)) {
             filePaths
