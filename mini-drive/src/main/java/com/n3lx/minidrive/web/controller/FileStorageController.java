@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/storage")
@@ -40,6 +41,12 @@ public class FileStorageController {
     @RequestMapping(value = "/load", method = RequestMethod.GET)
     public ResponseEntity<?> load(@RequestPart String fileName, @AuthenticationPrincipal User user) {
         var resource = fileStorageService.load(fileName, user.getId());
+        return ResponseEntity.ok(resource);
+    }
+
+    @RequestMapping(value = "/loadmultiple", method = RequestMethod.GET)
+    public ResponseEntity<?> loadMultiple(@RequestBody List<String> fileNames, @AuthenticationPrincipal User user) {
+        var resource = fileStorageService.loadMultiple(fileNames, user.getId());
         return ResponseEntity.ok(resource);
     }
 

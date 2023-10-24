@@ -82,6 +82,10 @@ public class FileStorageControllerTest {
         return Paths.get(propertiesUtil.getRootDirAbsolutePath(), String.valueOf(userDTO.getId())).normalize();
     }
 
+    Path getTestTempDirectoryPath() {
+        return Paths.get(propertiesUtil.getRootDirAbsolutePath(), propertiesUtil.getTempDirName()).normalize();
+    }
+
     Path getTestFilePath() {
         return Paths.get("src/test/resources/Bee Movie Transcript.txt").toAbsolutePath().normalize();
     }
@@ -232,6 +236,94 @@ public class FileStorageControllerTest {
                 .body("timestamp", notNullValue());
 
         assertFalse(getTestUserDirectoryPath().resolve(newFileName).toFile().exists());
+    }
+
+    @Test
+    public void loadMultiple_emptyRequestBody_returnsBadRequest() {
+        given()
+                .port(port)
+                .auth().oauth2(jwtUtil.generateToken(getTestUser()))
+                .when()
+                .get("/api/storage/loadmultiple")
+                .then()
+                .statusCode(400)
+                .body("message", equalTo("Empty request body, " +
+                        "refer to OpenAPI for correct usage of this endpoint"))
+                .body("timestamp", notNullValue());
+
+        assertFalse(Files.exists(getTestTempDirectoryPath()));
+    }
+
+    @Test
+    public void loadMultiple_listOfSingleNonExistingFile_returnsBadRequest() {
+        given()
+                .port(port)
+                .auth().oauth2(jwtUtil.generateToken(getTestUser()))
+                .contentType("application/json")
+                .body("[\"1.txt\"]")
+                .when()
+                .get("/api/storage/loadmultiple")
+                .then()
+                .statusCode(400)
+                .body("message", equalTo("File 1.txt was not found in storage"))
+                .body("timestamp", notNullValue());
+
+        assertFalse(Files.exists(getTestTempDirectoryPath()));
+    }
+
+    @Test
+    public void loadMultiple_listOfMultipleNonExistingFiles_returnsBadRequest() {
+        given()
+                .port(port)
+                .auth().oauth2(jwtUtil.generateToken(getTestUser()))
+                .contentType("application/json")
+                .body("[\"1.txt\",\"2.txt\"]")
+                .when()
+                .get("/api/storage/loadmultiple")
+                .then()
+                .statusCode(400)
+                .body("message", equalTo("File 1.txt was not found in storage"))
+                .body("timestamp", notNullValue());
+
+        assertFalse(Files.exists(getTestTempDirectoryPath()));
+    }
+
+    @Test
+    public void loadMultiple_listWithMultipleEntriesButSingleNonExistingFile_returnsBadRequest() {
+        copyTestFileToTestUserDirectory();
+
+        given()
+                .port(port)
+                .auth().oauth2(jwtUtil.generateToken(getTestUser()))
+                .contentType("application/json")
+                .body("[\"Bee Movie Transcript.txt\",\"2.txt\"]")
+                .when()
+                .get("/api/storage/loadmultiple")
+                .then()
+                .statusCode(400)
+                .body("message", equalTo("File 2.txt was not found in storage"))
+                .body("timestamp", notNullValue());
+
+        assertFalse(Files.exists(getTestTempDirectoryPath()));
+    }
+
+    @Test
+    public void loadMultiple_listWithSingleValidFile_returnsStream() throws IOException {
+        copyTestFileToTestUserDirectory();
+
+        given()
+                .port(port)
+                .auth().oauth2(jwtUtil.generateToken(getTestUser()))
+                .contentType("application/json")
+                .body("[\"Bee Movie Transcript.txt\"]")
+                .when()
+                .get("/api/storage/loadmultiple")
+                .then()
+                .statusCode(200)
+                .body(notNullValue());
+
+        assertTrue(Files.exists(getTestTempDirectoryPath()));
+        assertEquals(2, Files.walk(getTestTempDirectoryPath()).count());
     }
 
 }

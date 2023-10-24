@@ -11,6 +11,8 @@ public interface FileStorageService {
 
     Resource load(String filename, Long ownerId);
 
+    Resource loadMultiple(List<String> filenames, Long ownerId);
+
     List<String> listAllFiles(Long ownerId);
 
     boolean delete(String filename, Long ownerId);

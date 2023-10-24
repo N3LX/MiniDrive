@@ -24,6 +24,7 @@ app:
     validityTimeInSeconds: 600
   fileStorage:
     rootDirAbsolutePath: "C:\\MiniDriveStorage"
+    tempDirName: ".temp"
 
 logging:
   level:
