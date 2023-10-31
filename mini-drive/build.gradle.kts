@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "com.n3lx"
-version = "1.1"
+version = "1.1.1"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_17
