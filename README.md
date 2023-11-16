@@ -2,6 +2,14 @@
 
 MiniDrive is a simple REST API that works similarly to cloud services like Google Drive or Dropbox.
 
+Currently implemented features include:
+- User registration and authentication
+- Uploading files
+- Listing uploaded files
+- Removing files
+- Downloading single files
+- Downloading multiple files in a .zip archive
+
 Application uses:
 - Spring Boot
 - Spring Security with my own implementation of JWT Authentication
