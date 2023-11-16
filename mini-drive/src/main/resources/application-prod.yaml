@@ -18,6 +18,9 @@ spring:
       max-file-size: 1GB
       max-request-size: 1GB
 
+server:
+  port: 8080
+
 app:
   jwt:
     secret: )H=#T@#[]HdPDMNqNMCMVS_usIr~_0Si87Zys562Sw~TAj$JKlx!]eYK.57ld#'W
