@@ -1,0 +1,16 @@
+FROM alpine:3.18.4
+
+ENV SPRING_PROFILES_ACTIVE prod
+
+RUN apk update && apk add openjdk17 gradle
+
+WORKDIR /mini-drive-build
+COPY ./mini-drive .
+RUN gradle :bootJar
+
+RUN mkdir /mini-drive && mv build/libs/mini-drive-* /mini-drive/mini-drive.jar
+
+WORKDIR /mini-drive
+RUN rm -rf /mini-drive-build
+
+CMD ["java", "-jar", "mini-drive.jar"]
