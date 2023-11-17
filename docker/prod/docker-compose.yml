@@ -18,5 +18,3 @@ services:
       POSTGRES_DB: drive
       POSTGRES_USER: mini-drive
       POSTGRES_PASSWORD: password
-    ports:
-      - "5432:5432"
