@@ -3,7 +3,7 @@ spring:
     activate:
       on-profile: prod
   datasource:
-    url: jdbc:postgresql://localhost:5432/drive
+    url: jdbc:postgresql://db:5432/drive
     username: mini-drive
     password: password
     driverClassName: org.postgresql.Driver
@@ -17,6 +17,9 @@ spring:
     multipart:
       max-file-size: 1GB
       max-request-size: 1GB
+
+server:
+  port: 8080
 
 app:
   jwt:

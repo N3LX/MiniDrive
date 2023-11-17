@@ -2,6 +2,14 @@
 
 MiniDrive is a simple REST API that works similarly to cloud services like Google Drive or Dropbox.
 
+Currently implemented features include:
+- User registration and authentication
+- Uploading files
+- Listing uploaded files
+- Removing files
+- Downloading single files
+- Downloading multiple files in a .zip archive
+
 Application uses:
 - Spring Boot
 - Spring Security with my own implementation of JWT Authentication
@@ -20,17 +28,20 @@ After cloning the repository make sure that you have following applications inst
 
 Alternatively, you can provide your own Postgres database instead of the that was included as a docker-compose stack, then Docker tools are not required.
 
-## How to run/stop
+## How to run
 
-*This is minimal required effort to run the application, if you want to use it on your own I strongly encourage check all application.yml properties and changing any secrets and storage locations. Database credentials can be changed directory in database/docker-compose.yml*
+*If you want to use it on any sort of server exposed to the internet I strongly encourage you to check all application.yml properties and changing any secrets, passwords and storage locations. Database credentials can be changed in docker/prod/docker-compose.yml directory*
 
-*Note: PGAdmin for debugging is available at http://localhost:5050/, credentials are included in database/docker-compose.yml*
+*PGAdmin is available in dev docker-compose config at http://localhost:5050/, credentials can be found in docker/dev/docker-compose.yml*
 
-1. Spin up docker-compose.yml from /database directory
-2. Open application.yml in src/main/resources and ensure that rootDirAbsolutePath is set correctly depending on your filesystem and desired location
-3. Run the java project via :bootRun gradle task
+Steps to run the application:
 
-By default a DEV config is used, to run a PROD config simply pass `SPRING_PROFILES_ACTIVE=prod` environment variable when launching the application.
+1. Clone the repository
+2. Navigate to docker/prod
+3. Run `docker compose up -d`, this will take some time on the first run. Subsequent runs will be faster.
+4. Application is available on port 8080
+
+For development - by default dev config is used, as long as you start docker-compose file from docker/dev you should be able to run the application via `gradle bootRun` command or an IDE of your choice without additional configuration on your end.
 
 ## API endpoints
 

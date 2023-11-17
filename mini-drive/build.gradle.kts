@@ -1,11 +1,11 @@
 plugins {
     java
-    id("org.springframework.boot") version "3.1.4"
-    id("io.spring.dependency-management") version "1.1.3"
+    id("org.springframework.boot") version "3.1.5"
+    id("io.spring.dependency-management") version "1.1.4"
 }
 
 group = "com.n3lx"
-version = "1.1"
+version = "1.1.1"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_17
@@ -21,7 +21,7 @@ repositories {
     mavenCentral()
 }
 
-var lombokVersion = "1.18.26"
+var lombokVersion = "1.18.30"
 var jjwtVersion = "0.11.5"
 
 dependencies {
@@ -31,7 +31,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-jdbc")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     runtimeOnly("org.postgresql:postgresql:42.6.0")
-    implementation("org.liquibase:liquibase-core:4.23.2")
+    implementation("org.liquibase:liquibase-core:4.25.0")
     implementation("io.jsonwebtoken:jjwt-api:$jjwtVersion")
     runtimeOnly("io.jsonwebtoken:jjwt-impl:$jjwtVersion")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:$jjwtVersion")
